@@ -42,24 +42,25 @@ def recommend_movies(user):
         if other_user == user:
             continue
         sim = similarity(user, other_user)
-        #print(sim)
-        print(f"Similitud entre {user} y {other_user}: {sim}")
-        if sim <= 0:
-            continue
+        print(sim)
+        #print(f"Similitud entre {user} y {other_user}: {sim}")
         for movie in ratings[other_user]:
             if movie not in ratings[user] or ratings[user][movie] == 0:
                 totals.setdefault(movie, 0)
                 totals[movie] += ratings[other_user][movie] * sim
                 sim_sums.setdefault(movie, 0)
-                sim_sums[movie] += sim
+                sim_sums[movie] += abs(sim)
 
-    print("Totales:", totals)
-    print("Sim Sums:", sim_sums)
-    rankings = [(total / sim_sums[movie], movie) for movie, total in totals.items()]
+    
+    rankings = [(totals[movie] / sim_sums[movie], movie) for movie in totals]
+    #print(rankings)
     rankings.sort(reverse=True)
     recommendations = [movie for score, movie in rankings]
+    print("Totales:", totals)
+    print("Sim Sums:", sim_sums)
+    print(recommendations)
     return recommendations
 
 # Ejemplo de uso
 user_A_recommendations = recommend_movies('A')
-print("AARecomendaciones para el usuario A:", user_A_recommendations)
+print("Recomendaciones para el usuario A:", user_A_recommendations)
