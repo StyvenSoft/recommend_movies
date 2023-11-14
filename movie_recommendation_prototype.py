@@ -1,94 +1,20 @@
 import json
+import math
 
 # Definir preguntas y géneros
 preguntas_generos = {
-    "Pregunta1": {"pregunta": "1. ¿Disfrutas de escenas de lucha y persecuciones emocionantes en las películas?", "genero": "Acción"},
+    "Pregunta1": {"pregunta": "1. ¿Disfrutas de escenas de lucha y persecuciones emocionantes en las películas?", "genero": "Accion"},
     "Pregunta2": {"pregunta": "2. ¿Te gustan las historias que involucran exploración y descubrimiento de lugares desconocidos?", "genero": "Aventura"},
-    "Pregunta3": {"pregunta": "3. ¿Te interesa la tecnología futurista y los conceptos científicos en las películas?", "genero": "Ciencia Ficción"},
+    "Pregunta3": {"pregunta": "3. ¿Te interesa la tecnología futurista y los conceptos científicos en las películas?", "genero": "Ciencia"},
     "Pregunta4": {"pregunta": "4. ¿Prefieres películas que te hagan reír y alivien el estrés?", "genero": "Comedia"},
     "Pregunta5": {"pregunta": "5. ¿Te emocionan las historias profundas y emotivas sobre la vida y las relaciones?", "genero": "Drama"},
-    "Pregunta6": {"pregunta": "6. ¿Disfrutas de mundos imaginarios, criaturas mágicas y elementos fantásticos?", "genero": "Fantasía"},
+    "Pregunta6": {"pregunta": "6. ¿Disfrutas de mundos imaginarios, criaturas mágicas y elementos fantásticos?", "genero": "Fantasia"},
     "Pregunta7": {"pregunta": "7. ¿Te gusta la tensión y la intriga que se desarrolla a lo largo de una película?", "genero": "Suspenso"},
     "Pregunta8": {"pregunta": "8. ¿Te emociona la sensación de miedo y los elementos sobrenaturales en las películas?", "genero": "Terror"}
 }
 
-def cargar_peliculas():
-    # Estructura JSON de las películas
-    movies_json = '''
-    {
-      "peliculas": [
-        {
-          "id": 1,
-          "titulo": "Star Wars",
-          "genero": ["Ciencia Ficción", "Aventura"],
-          "puntuacion": 6
-        },
-        {
-          "id": 2,
-          "titulo": "The Matrix",
-          "genero": ["Ciencia Ficción", "Acción"],
-          "puntuacion": 4
-        },
-        {
-          "id": 3,
-          "titulo": "Inception",
-          "genero": ["Comedia", "Acción"],
-          "puntuacion": 8
-        },
-        {
-          "id": 4,
-          "titulo": "Iron Man",
-          "genero": ["Ciencia Ficción", "Drama"],
-          "puntuacion": 6
-        },
-        {
-          "id": 5,
-          "titulo": "Moonlight",
-          "genero": ["Fantasía", "Acción"],
-          "puntuacion": 5
-        },
-        {
-          "id": 6,
-          "titulo": "Salvad",
-          "genero": ["Suspenso", "Drama"],
-          "puntuacion": 7
-        },
-        {
-          "id": 7,
-          "titulo": "Fitzcarraldo",
-          "genero": ["Aventura", "Comedia"],
-          "puntuacion": 5
-        },
-        {
-          "id": 8,
-          "titulo": "Roma",
-          "genero": ["Ciencia Ficción", "Terror"],
-          "puntuacion": 3
-        },
-        {
-          "id": 9,
-          "titulo": "Colombia",
-          "genero": ["Suspenso", "Drama"],
-          "puntuacion": 4
-        },
-        {
-          "id": 10,
-          "titulo": "USA",
-          "genero": ["Aventura", "Comedia"],
-          "puntuacion": 4
-        },
-        {
-          "id": 11,
-          "titulo": "Francia",
-          "genero": ["Ciencia Ficción", "Terror"],
-          "puntuacion": 6
-        }
-      ]
-    }
-    '''
-
-    # Cargar las películas desde el JSON
-    return json.loads(movies_json)["peliculas"]
+with open('movies.json', 'r') as file:
+    movies_data = json.load(file)
 
 # Inicializar diccionario para almacenar las respuestas
 respuestas = {}
@@ -122,23 +48,58 @@ for key, value in preguntas_generos.items():
 # Filtrar géneros según las respuestas con calificación 5
 respuestas_usuario = [value["genero"] for key, value in preguntas_generos.items() if respuestas[key] == 5]
 
+def cosine_similarity(vec1, vec2):
+    dot_product = sum(vec1[key] * vec2.get(key, 0) for key in vec1)
+    magnitude_vec1 = math.sqrt(sum(val ** 2 for val in vec1.values()))
+    magnitude_vec2 = math.sqrt(sum(val ** 2 for val in vec2.values()))
+    result_mag = dot_product / (magnitude_vec1 * magnitude_vec2)
+    return result_mag
+
+def collaborative_filtering(user_ratings, all_ratings):
+    similarities = {}
+    for other_user, other_ratings in all_ratings.items():
+        if other_user == user_ratings:
+            continue
+        consinee_result = cosine_similarity(user_ratings, other_ratings)
+        #print(consinee_result)
+        similarities[other_user] = cosine_similarity(user_ratings, other_ratings)
+
+    sorted_similarities = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
+    print(sorted_similarities)
+
+    recommendations = {}
+    for movie_id, rating in user_ratings.items():
+        for other_user, similarity in sorted_similarities:
+            if other_user in all_ratings and movie_id in all_ratings[other_user] and all_ratings[other_user][movie_id] > rating:
+                recommendations[movie_id] = recommendations.get(movie_id, 0) + similarity * (all_ratings[other_user][movie_id] - rating)
+
+    sorted_recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)
+    result_movies = [movie_id for movie_id, score in sorted_recommendations]
+    #print(result_movies)
+    return result_movies
+
 def generar_recomendaciones(respuestas_usuario, peliculas):
-    # Filtrar películas según géneros seleccionados
-    peliculas_filtradas = [p for p in peliculas if any(genero in p["genero"] for genero in respuestas_usuario)]
+    # Obtener las puntuaciones del usuario
+    user_ratings = {}
+    for genre in respuestas_usuario:
+        for movie in peliculas["peliculas"]:
+            if genre in movie["genero"]:
+                user_ratings[movie["id"]] = user_ratings.get(movie["id"], 0) + 1
 
-    # Ordenar películas por puntuación de mayor a menor
-    peliculas_ordenadas = sorted(peliculas_filtradas, key=lambda x: x["puntuacion"], reverse=True)
+    # Aplicar el algoritmo de filtrado colaborativo
+    result_moviess = {movie["id"]: movie["puntuaciones"] for movie in peliculas["peliculas"]}
+    print(result_moviess)
+    recommendations = collaborative_filtering(user_ratings, {movie["id"]: movie["puntuaciones"] for movie in peliculas["peliculas"]})
+    print(recommendations)
+    # Obtener los títulos de las películas recomendadas
+    recommended_movies = [movie["titulo"] for movie in peliculas["peliculas"] if movie["id"] in recommendations]
 
-    # Tomar las 5 primeras películas (o menos si hay menos de 5)
-    recomendaciones = peliculas_ordenadas[:5]
-
-    return [pelicula["titulo"] for pelicula in recomendaciones]
+    return recommended_movies
 
 
 print(f"\nResultado para el usuario: {nombre_usuario}!")
 
 print(respuestas_usuario)
-peliculas = cargar_peliculas()
-recomendaciones = generar_recomendaciones(respuestas_usuario, peliculas)
+recomendaciones = generar_recomendaciones(respuestas_usuario, movies_data)
 print("Géneros recomendados según tus respuestas:")
 print(recomendaciones)
