@@ -1,0 +1,88 @@
+{
+    "peliculas": [
+        {
+            "id": 1,
+            "titulo": "Star Wars",
+            "genero": ["Ciencia", "Aventura"],
+            "puntuaciones": {
+                "usuario1": 5,
+                "usuario2": 4,
+                "usuario3": 3,
+                "usuario4": 7,
+                "usuario5": 5,
+                "usuario6": 3,
+                "usuario7": 4,
+                "usuario8": 3,
+                "usuario9": 5,
+                "usuario10": 4,
+                "usuario11": 7,
+                "usuario12": 6,
+                "usuario13": 6,
+                "usuario14": 4,
+                "usuario15": 3,
+                "usuario16": 5,
+                "usuario17": 4,
+                "usuario18": 7,
+                "usuario19": 6,
+                "usuario20": 6,
+                "usuario21": 4
+            }
+        },
+        {
+            "id": 2,
+            "titulo": "The Matrix",
+            "genero": ["Ciencia", "Accion"],
+            "puntuaciones": {
+                "usuario1": 4,
+                "usuario2": 5,
+                "usuario3": 3,
+                "usuario4": 7,
+                "usuario5": 5,
+                "usuario6": 6,
+                "usuario7": 8,
+                "usuario8": 3,
+                "usuario9": 5,
+                "usuario10": 4,
+                "usuario11": 7,
+                "usuario12": 6,
+                "usuario13": 6,
+                "usuario14": 4,
+                "usuario15": 3,
+                "usuario16": 5,
+                "usuario17": 4,
+                "usuario18": 7,
+                "usuario19": 6,
+                "usuario20": 6,
+                "usuario21": 4
+            }
+        },
+        {
+            "id": 3,
+            "titulo": "Amadeus",
+            "genero": ["Drama", "Suspenso"],
+            "puntuaciones": {
+                "usuario1": 4,
+                "usuario2": 3,
+                "usuario3": 2,
+                "usuario4": 7,
+                "usuario5": 1,
+                "usuario6": 6,
+                "usuario7": 2,
+                "usuario8": 3,
+                "usuario9": 5,
+                "usuario10": 4,
+                "usuario11": 7,
+                "usuario12": 6,
+                "usuario13": 6,
+                "usuario14": 4,
+                "usuario15": 3,
+                "usuario16": 5,
+                "usuario17": 4,
+                "usuario18": 7,
+                "usuario19": 6,
+                "usuario20": 6,
+                "usuario21": 4
+            }
+        }
+    ]
+}

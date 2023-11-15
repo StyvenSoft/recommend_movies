@@ -49,23 +49,26 @@ for key, value in preguntas_generos.items():
 respuestas_usuario = [value["genero"] for key, value in preguntas_generos.items() if respuestas[key] == 5]
 
 def cosine_similarity(vec1, vec2):
-    dot_product = sum(vec1[key] * vec2.get(key, 0) for key in vec1)
-    magnitude_vec1 = math.sqrt(sum(val ** 2 for val in vec1.values()))
-    magnitude_vec2 = math.sqrt(sum(val ** 2 for val in vec2.values()))
-    result_mag = dot_product / (magnitude_vec1 * magnitude_vec2)
-    return result_mag
+    common_movies = set(vec1) & set(vec2)
+    dot_product = sum(vec1[i] * vec2[i] for i in range(len(vec1)) if i in common_movies)
+    magnitude_vec1 = math.sqrt(sum(val ** 2 for val in vec1))
+    magnitude_vec2 = math.sqrt(sum(val ** 2 for val in vec2))
+    return dot_product / (magnitude_vec1 * magnitude_vec2) if magnitude_vec1 != 0 and magnitude_vec2 != 0 else 0
+    
 
 def collaborative_filtering(user_ratings, all_ratings):
     similarities = {}
     for other_user, other_ratings in all_ratings.items():
         if other_user == user_ratings:
             continue
-        consinee_result = cosine_similarity(user_ratings, other_ratings)
+        #consinee_result = cosine_similarity(user_ratings, other_ratings)
         #print(consinee_result)
-        similarities[other_user] = cosine_similarity(user_ratings, other_ratings)
+        #print(other_user)
+        #print(user_ratings)
+        similarities[other_user] = cosine_similarity(list(user_ratings.values()), list(other_ratings.values()))
 
     sorted_similarities = sorted(similarities.items(), key=lambda x: x[1], reverse=True)
-    print(sorted_similarities)
+    #print(sorted_similarities)
 
     recommendations = {}
     for movie_id, rating in user_ratings.items():
@@ -81,16 +84,19 @@ def collaborative_filtering(user_ratings, all_ratings):
 def generar_recomendaciones(respuestas_usuario, peliculas):
     # Obtener las puntuaciones del usuario
     user_ratings = {}
+    #print(respuestas_usuario)
+    #print(peliculas)
     for genre in respuestas_usuario:
         for movie in peliculas["peliculas"]:
             if genre in movie["genero"]:
-                user_ratings[movie["id"]] = user_ratings.get(movie["id"], 0) + 1
+                user_ratings[movie["id"]] = user_ratings.get(movie["id"], [])
+                user_ratings[movie["id"]].append(movie["puntuaciones"]["usuario1"])  # Puedes ajustar el nombre del usuario según sea necesario
 
     # Aplicar el algoritmo de filtrado colaborativo
-    result_moviess = {movie["id"]: movie["puntuaciones"] for movie in peliculas["peliculas"]}
-    print(result_moviess)
-    recommendations = collaborative_filtering(user_ratings, {movie["id"]: movie["puntuaciones"] for movie in peliculas["peliculas"]})
-    print(recommendations)
+    result_moviess = {movie["id"]: {user: movie["puntuaciones"][user] for user in movie["puntuaciones"]} for movie in peliculas["peliculas"]}
+    #print(result_moviess)
+    recommendations = collaborative_filtering(user_ratings, result_moviess)
+    #print(recommendations)
     # Obtener los títulos de las películas recomendadas
     recommended_movies = [movie["titulo"] for movie in peliculas["peliculas"] if movie["id"] in recommendations]
 

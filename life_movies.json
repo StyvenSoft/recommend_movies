@@ -1,0 +1,47 @@
+[
+    {
+        "titulo": "Star Wars",
+        "genero": "Ciencia",
+        "puntuaciones": {
+            "usuario1": 5,
+            "usuario2": 4,
+            "usuario3": 3
+        }
+    },
+    {
+        "titulo": "The Matrix",
+        "genero": "Accion",
+        "puntuaciones": {
+            "usuario1": 4,
+            "usuario2": 5,
+            "usuario3": 3
+        }
+    },
+    {
+        "titulo": "Golden",
+        "genero": "Accion",
+        "puntuaciones": {
+            "usuario1": 7,
+            "usuario2": 8,
+            "usuario3": 9
+        }
+    },
+    {
+        "titulo": "Momia",
+        "genero": "Terror",
+        "puntuaciones": {
+            "usuario1": 1,
+            "usuario2": 2,
+            "usuario3": 1
+        }
+    },
+    {
+        "titulo": "Roja",
+        "genero": "Terror",
+        "puntuaciones": {
+            "usuario1": 8,
+            "usuario2": 9,
+            "usuario3": 9
+        }
+    }
+]
