@@ -1,3 +1,4 @@
+# Importar la función de similitud del coseno desde scipy
 from scipy.spatial.distance import cosine
 import json
 
@@ -37,6 +38,7 @@ preguntas_generos = {
         }
 }
 
+# Cargar las películas desde el archivo JSON
 with open('new_movies.json', 'r') as file:
     movies = json.load(file)
 
@@ -44,6 +46,7 @@ with open('new_movies.json', 'r') as file:
 respuestas = {}
 print("Prototipo: Sistema de recomendación de películas basado en gustos.\n")
 
+# Definir función para obtener el nombre del usuario
 def obtener_nombre_usuario():
     while True:
         nombre_usuario = input("Ingresa tu nombre: ").strip()  # Elimina espacios al inicio y al final
@@ -58,6 +61,7 @@ def obtener_nombre_usuario():
 # Preguntar el nombre del usuario
 nombre_usuario = obtener_nombre_usuario()
 
+# Solicitar respuestas a las preguntas y almacenarlas en respuestas
 print(f"\nPor favor, {nombre_usuario}. Responde el siguiente cuestionario de 8 preguntas:")
 print(f"Realiza la calificación segun tus gustos del 0 al 5, donde 0 significa nada agradable, 5 muy agradable:\n")
 
@@ -76,6 +80,7 @@ respuestas_usuario = [value["genero"] for key, value in preguntas_generos.items(
 
 # Definir la función de similitud coseno entre dos vectores
 def cosine_similarity(vec1, vec2):
+    # Obtener las claves comunes entre los dos vectores
     common_keys = set(vec1.keys()) & set(vec2.keys())
     vec1_values = [vec1[key] for key in common_keys]
     vec2_values = [vec2[key] for key in common_keys]
@@ -130,9 +135,11 @@ user_ratings = diccionario_puntuaciones(respuestas_usuario, movies)
 # Crear un diccionario con todas las puntuaciones de todos los usuarios
 all_ratings = {user: ratings for user, ratings in zip(user_ratings.keys(), user_ratings.values())}
 
+# Imprimir géneros de películas preferidos para el usuario
 print(f"\nGenero de peliculas preferidos para : {nombre_usuario}")
-
 print(respuestas_usuario)
+
+# Obtener y mostrar las recomendaciones
 recomendaciones = collaborative_filtering(user_ratings["usuario1"], all_ratings)
 # Imprimir las recomendaciones
 print("\nPelículas recomendadas según tus respuestas:")
